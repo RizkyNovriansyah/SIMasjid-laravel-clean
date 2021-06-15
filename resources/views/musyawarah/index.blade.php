@@ -76,7 +76,17 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
                                         <td>{{ $notulensi->status }}</td>
                                         <td class="dt-center">
                                             <div class="btn-group mb-3" role="group" aria-label="Basic example" style="padding-left: 20px;">
-                                                <a class="open-detail btn btn-icon btn-sm btn-warning" href="{{ route('musyawarahEdit',$notulensi->id) }}"><i class="fas fa-edit"></i> revisi</a>
+                                                @if($notulensi->user_role)
+                                                    @foreach ($notulensi->user_role as $user_role)
+                                                        @if($notulensi->status == "Menunggu Persetujuan")
+                                                            @if($user_role->role == "Notulen")
+                                                                <a class="open-detail btn btn-icon btn-sm btn-warning" href="{{ route('musyawarahEdit',$notulensi->id) }}"><i class="fas fa-edit"></i> revisi</a>
+                                                            @elseif($user_role->role == "Amir")
+                                                                <a class="open-detail btn btn-icon btn-sm btn-primary" href="{{ route('musyawarahEdit',$notulensi->id) }}"><i class="far fa-check-circle"></i> Setujui</a>
+                                                            @endif    
+                                                        @endif
+                                                    @endforeach
+                                                @endif
                                                 <a href="#" class="open-detail btn btn-icon btn-sm btn-info" data-toggle="modal" data-id="{{ $notulensi->id }}" data-target="#detailModal"><i class="fas fa-id-badge"></i> Detail</a>
                                             </div>
                                         </td>
@@ -394,9 +404,8 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (data) {   
-                console.log("data", data)
+                $("#list_progress_notulensi").empty()
                 data.forEach(element => {
-                    console.log("element", element)
                     let html_progress = '<tr><td><a href="#" class="font-weight-600">'+element.pekerjaan.nama+'</a></td><td><span>'+element.keterangan+'</span></td><td><span>'+element.keputusan+'</span></td></tr>'
                     $("#list_progress_notulensi").append(html_progress);
 
@@ -420,9 +429,8 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (data) {   
-                console.log("data", data)
                 data.forEach(element => {
-                    console.log("element", element)
+                    $("#komentar_user").empty()
                     let html_progress = '<li class="media"><img class="mr-3 rounded-circle" src="'+element.anggota.link_foto+'" alt="avatar" width="50"><div class="media-body"><div class="float-right text-primary">'+element.updated_at+'</div><div class="media-title">'+element.anggota.nama+'</div><span class="text-small text-muted">'+element.keterangan+'</span></div></li>'
                     $("#komentar_user").append(html_progress);  
                 });

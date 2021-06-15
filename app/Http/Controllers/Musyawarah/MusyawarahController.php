@@ -14,6 +14,13 @@ use Auth;
 
 class MusyawarahController extends Controller
 {
+    //CONSTANT VALUES FOR MEMBER JABATAN
+    public const KETUA = 1;
+    public const SEKRETARIS = 2;
+    public const BENDAHARA = 3;
+    public const TAKMIR = 4;
+    public const REMAS = 5;
+    public const AMIR = 6;
 
     //CONSTANT VALUES FOR MEMBER STATUS
     public const ACTIVE_MEMBER = 1;
@@ -22,10 +29,17 @@ class MusyawarahController extends Controller
 
     public function index()
     {
+        $authUser = Auth::user();
         //semua user, composite object
         $anggotaGroup = Anggota::get()->where('id_status', '!=', self::UNVERIFIED_MEMBER);
         
         $notulensiGroup = Notulensi::all();
+        foreach ($notulensiGroup as $key => $value) {
+            if ($value['status'] == "Menunggu Persetujuan"){
+                $kehadiran = Kehadiran::get()->where('id_notulensi',$value->id)->where('id_anggota',$authUser->id);
+                $value['user_role'] = $kehadiran;
+            }            
+        }
 
         //retval
         return view('musyawarah.index', ['anggotaGroup' => $anggotaGroup,'notulensiGroup' => $notulensiGroup]);
@@ -232,12 +246,7 @@ class MusyawarahController extends Controller
         $pekerjaan->progress = $pp;
         return $pekerjaan;
     }
-    // //CONSTANT VALUES FOR MEMBER JABATAN
-    // public const KETUA = 1;
-    // public const SEKRETARIS = 2;
-    // public const BENDAHARA = 3;
-    // public const TAKMIR = 4;
-    // public const REMAS = 5;
+    
 
     // public function getJabatan(Anggota $anggota)
     // {
