@@ -29,17 +29,17 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
         </div>
         <div class="section-body">
             <div class="row">
-                <button style="margin: 1em auto;" class="btn btn-dark" data-toggle="collapse" data-target="#filter-box">
-                    <i class="fa fa-filter"></i> Show/Close Filter Data
-                </button>
-                <div class="col-12">
+                <a href="{{ route('musyawarahCari') }}" style="margin: 1em auto;" class="btn btn-dark">
+                    <i class="fa fa-filter"></i> Cari Musyawarah
+                </a>
+                <!-- <div class="col-12">
                     <div id="filter-box" class="collapse">
                         <div class="card-body">
                             <h6 style="text-align:center"><i class="fa fa-filter"></i> Filter Data</h6>
                             <div class="column-search"></div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="row">
                 <div class="col-12">

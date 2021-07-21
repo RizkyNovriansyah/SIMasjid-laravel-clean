@@ -28,8 +28,11 @@ Route::middleware('auth')->group(function () {
         //route musyawarah
         Route::get('musyawarah', 'Musyawarah\MusyawarahController@index')->name('musyawarahIndex');
         Route::get('musyawarah/add', 'Musyawarah\MusyawarahController@addNotulensi')->name('musyawarahAdd');
+        Route::get('musyawarah/cari', 'Musyawarah\MusyawarahController@cariNotulensi')->name('musyawarahCari');
+        Route::post('musyawarah/cariquery', 'Musyawarah\MusyawarahController@cariqueryNotulensi')->name('musyawarahCariQuery');
         Route::get('musyawarah/edit/{id}', 'Musyawarah\MusyawarahController@editNotulensi')->name('musyawarahEdit');
         Route::get('musyawarah/get/{id}', 'Musyawarah\MusyawarahController@getNotulensi')->name('musyawarahGetNotulensi');
+        Route::get('musyawarah/approve/{id}', 'Musyawarah\MusyawarahController@approveNotulensi')->name('musyawarahApproveNotulensi');
         Route::get('musyawarah/getkomentar/{id}', 'Musyawarah\MusyawarahController@getKomentarNotulensi')->name('musyawarahGetKomentarNotulensi');
         Route::post('musyawarah/komentarstore', 'Musyawarah\MusyawarahController@storeKomentarNotulensi')->name('musyawarahStoreKomentarNotulensi');
         

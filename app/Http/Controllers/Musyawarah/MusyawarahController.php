@@ -55,6 +55,55 @@ class MusyawarahController extends Controller
         return view('musyawarah.pekerjaan', ['anggotaGroup' => $anggotaGroup,'pekerjaanGroup'=>$pekerjaanGroup]);
     }
 
+    public function cariNotulensi()
+    {
+        //retval
+        return view('musyawarah.cari_notulensi', []);
+    }
+
+    public function cariqueryNotulensi(Request $request)
+    {
+        $judul_musyawarah = $request->judul_musyawarah;
+        $kata_kunci = $request->kata_kunci;
+        $kata_kuncis = (explode(" ",$kata_kunci));
+
+        $add_notulensi = array();
+        $notulensis = Notulensi::whereRaw("UPPER(judul_musyawarah) LIKE '%". strtoupper($judul_musyawarah)."%'")
+        ->orWhereRaw("UPPER(catatan) LIKE '%". strtoupper($judul_musyawarah)."%'")->get();
+        // dd($notulensis);
+        foreach ($notulensis as $key => $value) {
+            $is_add = false;
+            $notulensi = $value;
+            $catatan = $notulensi->catatan;
+            
+            $len_kk = 0;
+            $msg_pp = [];
+            foreach ($kata_kuncis as $key => $kk) {
+                $pps = ProgressPekerjaan::whereRaw("UPPER(keterangan) LIKE '%". strtoupper($kk)."%'")
+                ->orWhereRaw("UPPER(masukkan) LIKE '%". strtoupper($kk)."%'")
+                ->orWhereRaw("UPPER(keputusan) LIKE '%". strtoupper($kk)."%'")
+                ->get();
+                if (count($pps) > 0){
+                    $len_kk += 1;
+                    foreach ($pps as $key => $pp) {
+                        array_push($msg_pp,$pp);
+                    }
+                    $notulensi['msg_pp'] = $msg_pp;
+                }
+            }
+            if ($len_kk > 0){
+                $is_add = true;
+            }
+            if ($is_add){
+                array_push($add_notulensi,$notulensi);
+            }
+        }
+        
+        return $add_notulensi;
+    }
+
+
+
     public function addNotulensi()
     {
         //semua user, composite object
@@ -82,6 +131,14 @@ class MusyawarahController extends Controller
             $value['pekerjaan'] = $value->pekerjaan;
         }
         return $result;
+    }
+
+    public function approveNotulensi($id)
+    {
+        $notulensi = Notulensi::find($id);
+        $notulensi->status = "Dikunci";
+        $notulensi->save();
+        return $notulensi;
     }
 
     public function getKomentarNotulensi($id)

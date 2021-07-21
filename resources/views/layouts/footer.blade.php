@@ -102,7 +102,10 @@
         submit_notulensi();
     });
 
-    
+    $( "#cari-notulensi" ).click(function() {
+        console.log("click")
+        cari_notulensi();
+    });
 
     $(document).on('click', '.delete-progress', function () {
       console.log("click")
@@ -115,6 +118,31 @@
       kehadiran_musyawarah = kehadiran_musyawarah.join(",")
       $("#all_kehadiran_id").val(kehadiran_musyawarah)
       $("#form_notulensi").submit()
+    }
+
+    function cari_notulensi() {
+      let judul_musyawarah = $("#judul_musyawarah").val()
+      let kata_kunci = $("#kata_kunci").val()
+
+      let judul_musyawarah = $("#judul_musyawarah").val()
+      let kata_kunci = $("#kata_kunci").val()
+      
+      let url = "{{route('musyawarahCariQuery')}}"
+      $.ajax({
+          url: url,
+          type: "POST",
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          data: {
+              judul_musyawarah: judul_musyawarah,
+              kata_kunci: kata_kunci
+          },
+          success: function (data) {   
+              console.log("data",data)
+          }
+      });   
+
     }
 
     let already_inserted_id = []
