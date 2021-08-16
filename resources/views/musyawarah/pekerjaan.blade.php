@@ -119,7 +119,25 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
                                 </div>
                             </div>
                             <div class="card-footer pt-0">
-                                <button class="btn btn-primary">Save Draft</button>
+                                <input style="display:none" id="id_modal_selected"/>
+                                <div onclick="ubah_status_pekerjaan(1)" class="btn btn-danger">Ditolak</div>
+                                <div onclick="ubah_status_pekerjaan(2)" class="btn btn-info">Aktifkan</div>
+                                <!-- <div onclick="ubah_status_pekerjaan(3)" class="btn btn-primary">Batal</div> -->
+                                <div onclick="ubah_status_pekerjaan(4)" class="btn btn-success">Selesai</div>
+                                <script>
+                                    function ubah_status_pekerjaan(tipe_status) {
+                                        let id_modal_selected = $("#id_modal_selected").val()
+                                        var linkDetail = "{{ route('home') }}/musyawarah/pekerjaan/update_status/" + id_modal_selected+"/"+tipe_status;
+                                        console.log("linkDetail",linkDetail)
+                                        $.get(linkDetail, function(data) {
+                                            //deklarasi var obj JSON data detail anggota
+                                            var obj = data;
+                                            console.log("obj", obj)
+                                            $("#id_modal_selected").val(id_modal_selected)
+                                            set_detail_modal(obj)
+                                        });
+                                    }
+                                </script>
                             </div>
                             </div>
                         </form>
@@ -458,6 +476,48 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
         console.log("data_index 1", data_index);
         $("#id_progress_pekerjaan").val(data_index);
     });
+
+    function set_detail_modal(obj) {
+        $("#detail-status").html(obj.status)
+        $("#detail-title-pekerjaan").html(obj.nama+" ")
+        $("#detail-keterangan").html(obj.deskripsi+" ")
+        
+        data_index = obj.id;
+        console.log("data_index", data_index)
+        let progress = obj.progress;
+        let html_progress = ""
+        
+        for (let index = 0; index < progress.length; index++) {
+            const element = progress[index];
+            let link_foto = "{{ route('home') }}/" + element.pembuat_progress.link_foto;
+            let text_html = '<li class="media">'+
+            '<img class="mr-3 rounded-circle" src="'+link_foto+'" alt="avatar" width="50">'+
+            '<div class="media-body">'+
+            '<div class="float-right text-primary">'+element.created_at+'</div>'+
+            '<div class="media-title">'+element.pembuat_progress.nama+'</div>'+
+            '<span class="text-small text-muted">'+element.keterangan+'</span>'+
+            '</div>'+
+            '</li>'
+            html_progress += text_html;
+        }
+        $("#detail-list-progress").html(html_progress)
+        
+        $("#detail-status").removeClass();
+        let default_class = "badge badge-pill mb-1 float-right ";
+        let add_class = ""
+        if (obj.status == "Proses"){
+            add_class = "badge-info"
+        } else if (obj.status == "Menunggu Persetujuan"){
+            add_class = "badge-warning"
+        } else if (obj.status == "Ditolak"){
+            add_class = "badge-danger"
+        } else if (obj.status == "Batal"){
+            add_class = "badge-danger"
+        } else if (obj.status == "Selesai"){
+            add_class = "badge-success"
+        }
+        $("#detail-status").addClass(default_class+add_class);
+    }
     $(document).on("click", ".open-detail", function() {
         /* passing data dari view button detail ke modal */
         var thisDataAnggota = $(this).data('id');
@@ -467,43 +527,8 @@ $inside_sekretaris = in_array($authUser->id_jabatan, $sekretaris);
             //deklarasi var obj JSON data detail anggota
             var obj = data;
             console.log("obj", obj)
-            $("#detail-status").html(obj.status)
-            $("#detail-title-pekerjaan").html(obj.nama+" ")
-            $("#detail-keterangan").html(obj.deskripsi+" ")
-            
-            data_index = obj.id;
-            console.log("data_index", data_index)
-            let progress = obj.progress;
-            let html_progress = ""
-            
-            for (let index = 0; index < progress.length; index++) {
-                const element = progress[index];
-                let link_foto = "{{ route('home') }}/" + element.pembuat_progress.link_foto;
-                let text_html = '<li class="media">'+
-                '<img class="mr-3 rounded-circle" src="'+link_foto+'" alt="avatar" width="50">'+
-                '<div class="media-body">'+
-                '<div class="float-right text-primary">'+element.created_at+'</div>'+
-                '<div class="media-title">'+element.pembuat_progress.nama+'</div>'+
-                '<span class="text-small text-muted">'+element.keterangan+'</span>'+
-                '</div>'+
-                '</li>'
-                html_progress += text_html;
-            }
-            $("#detail-list-progress").html(html_progress)
-            // ganti elemen pada dokumen html dengan hasil data json dari jquery
-            // $("#detailNama").html(obj.nama);
-            // $("#detailJabatan").html(obj.jabatan);
-            // $("#detailStatus").html(obj.status);
-            // $("#detailEmail").html(obj.email);
-            // $("#detailAlamat").html(obj.alamat);
-            // $("#detailTelp").html(obj.telp);
-
-            // //base root project url + url dari db
-            // var link_foto = "{{ route('home') }}/" + obj.link_foto;
-            // $("#detailFoto").attr('src', link_foto);
-            // // console.log(link_foto);
-
-            // status_colorized()
+            $("#id_modal_selected").val(thisDataAnggota)
+            set_detail_modal(obj)
         });
     });
     $(document).ready(function() {

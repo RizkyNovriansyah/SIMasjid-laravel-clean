@@ -303,6 +303,21 @@ class MusyawarahController extends Controller
         $pekerjaan->progress = $pp;
         return $pekerjaan;
     }
+
+    public function setUpdateStatusPekerjaan($id,$tipe)
+    {
+        $pekerjaan = Pekerjaan::get()->where('id', $id)->first();
+        $status = ['Menunggu Persetujuan','Ditolak','Proses','Batal','Selesai'];
+        $pekerjaan->status = $status[$tipe];
+        $pekerjaan->save();
+        $pp = ProgressPekerjaan::where('id_pekerjaan', $id)->get();
+        for ($i=0; $i < count($pp); $i++) { 
+            $p = $pp[$i];
+            $p['creator'] = $p->pembuat_progress->nama;
+        }
+        $pekerjaan->progress = $pp;
+        return $pekerjaan;
+    }
     
 
     // public function getJabatan(Anggota $anggota)
